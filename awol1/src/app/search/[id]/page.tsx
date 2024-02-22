@@ -1,4 +1,5 @@
 "use client";
+import { Imovie } from "@/app/discover/[id]/page";
 import Card from "@/components/Card";
 import Footer from "@/components/Footer";
 import Loading from "@/components/Loading";
@@ -7,19 +8,12 @@ import axios from "axios";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import React, { useEffect, useRef, useState } from "react";
 
-export interface Imovie {
-  id: string;
-  poster_path: string;
-  title: string;
-  release_date: string;
-}
-
-const Discover = () => {
+const Search = () => {
   const [title, setTitle] = useState("");
   const [movies, setMovies] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPage, setTotalPage] = useState(1);
-  const [discover, setDiscover] = useState("");
+  const [search, setSearch] = useState("");
 
   const mainRef = useRef<HTMLDivElement>(null);
 
@@ -36,31 +30,14 @@ const Discover = () => {
     const id = params.id.toString();
     const page = searchParams.get("page");
 
-    setDiscover(id);
-
-    switch (id) {
-      case "now_playing":
-        setTitle("Now Playing Movies");
-        break;
-      case "top_rated":
-        setTitle("Top Rated Movies");
-        break;
-      case "popular":
-        setTitle("Popular Movies");
-        break;
-      case "upcoming":
-        setTitle("UpcomingMovies");
-        break;
-
-      default:
-        setTitle("");
-        break;
-    }
+    setTitle(`${id} Movies`)
+    setSearch(id);
 
     axios
-      .get(`${BASE_URL}/movie/${id}`, {
+      .get(`${BASE_URL}/search/movie`, {
         params: {
           api_key: process.env.NEXT_PUBLIC_API_KEY,
+          query: id,
           page,
         },
       })
@@ -69,7 +46,9 @@ const Discover = () => {
         setCurrentPage(response.data.page);
         setTotalPage(response.data.total_page);
       })
-      .catch((error) => console.log(error));
+      .catch((error) => {
+        console.log(error);
+      });
   }, [params.id, searchParams.get("page")]);
 
   const handlePageChange = (button: string) => {
@@ -80,7 +59,7 @@ const Discover = () => {
       page = `page=${currentPage + 1}`;
     }
 
-    router.push(`/discover/${discover}?${page}`);
+    router.push(`/search/${search}?${page}`);
   };
 
   return (
@@ -126,9 +105,8 @@ const Discover = () => {
       <div className="pb-20">
         <Footer />
       </div>
-
     </main>
   );
 };
 
-export default Discover;
+export default Search;

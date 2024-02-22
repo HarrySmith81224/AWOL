@@ -11,7 +11,7 @@ const Navbar = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setInput("");
-    router.push("/search/${input}?page=1");
+    router.push(`/search/${input}?page=1`);
   };
 
   return (
